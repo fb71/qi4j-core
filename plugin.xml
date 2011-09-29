@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin
+   id="org.qi4j.core"
+   name="Qi4j Core"
+   version="1.0.0.polymap"
+   provider-name="qi4j.org">
+   <runtime>
+      <library name="lib/cglib-nodep-2.2.jar">
+         <export
+               name="*">
+         </export>
+      </library>
+   </runtime>
+</plugin>

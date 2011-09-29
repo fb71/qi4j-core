@@ -15,3 +15,4 @@ testsupport/qi4j-core-testsupport.iml
 testsupport/target/
 build-tools/qi4j-buildtools.iml
 build-tools/target/
+/lib
