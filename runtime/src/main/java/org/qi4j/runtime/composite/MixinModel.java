@@ -159,6 +159,15 @@ public final class MixinModel
             e.setMixinClass( mixinClass );
             throw e;
         }
+        // XXX fb71: clean ThreadLocal to prevent mem leak
+        finally 
+        {
+            if( Factory.class.isAssignableFrom( instantiationClass ) )
+            {
+                Enhancer.registerCallbacks( instantiationClass, null );
+            }
+        }
+
         injectedFieldsModel.inject( injectionContext, mixin );
         injectedMethodsModel.inject( injectionContext, mixin );
         if( mixin instanceof Initializable )

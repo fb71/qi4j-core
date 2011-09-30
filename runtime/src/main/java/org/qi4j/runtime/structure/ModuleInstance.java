@@ -18,7 +18,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONException;
 import org.json.JSONTokener;
@@ -595,12 +594,14 @@ public class ModuleInstance
 
         public UnitOfWork currentUnitOfWork()
         {
-            Stack<UnitOfWorkInstance> stack = UnitOfWorkInstance.current.get();
-            if( stack.size() == 0 )
-            {
-                return null;
-            }
-            return new ModuleUnitOfWork( ModuleInstance.this, stack.peek() );
+            // FIXME fb71: ...
+            throw new RuntimeException( "UnitOfWorkInstance.current is commented out." );
+//            Stack<UnitOfWorkInstance> stack = UnitOfWorkInstance.current.get();
+//            if( stack.size() == 0 )
+//            {
+//                return null;
+//            }
+//            return new ModuleUnitOfWork( ModuleInstance.this, stack.peek() );
         }
 
         public UnitOfWork getUnitOfWork( EntityComposite entity )

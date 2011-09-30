@@ -1,12 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Qi4j
-Bundle-SymbolicName: org.qi4j.core;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Name: Qi4j Core
+Bundle-SymbolicName: qi4j-core;singleton:=true
+Bundle-Version: 1.0.1.polymap
 Bundle-Vendor: qi4j.org
-Require-Bundle: org.eclipse.core.runtime,
- org.polymap.core;bundle-version="3.0.0",
- org.eclipse.core.resources
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
@@ -28,6 +25,7 @@ Export-Package: org.json,
  org.qi4j.api.property,
  org.qi4j.api.query,
  org.qi4j.api.query.grammar,
+ org.qi4j.api.selection,
  org.qi4j.api.service,
  org.qi4j.api.sideeffect,
  org.qi4j.api.structure,

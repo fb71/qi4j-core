@@ -25,6 +25,9 @@ import org.qi4j.spi.composite.CompositeInstance;
 public class ThisCompositeInvoker
     implements MethodInterceptor
 {
+    // FIXME fb71: instances are held in ThreadLocal as Enhancer Callback (see MixinModel:150);
+    // and causing mem leak; I'm not quite sure how to fix this correctly; WeakReference is an
+    // option but probably makes things slow; maybe the fix in MixinModel is enough
     private CompositeInstance compositeInstance;
 
     public ThisCompositeInvoker( CompositeInstance compositeInstance )

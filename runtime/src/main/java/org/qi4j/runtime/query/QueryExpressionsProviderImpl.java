@@ -103,7 +103,10 @@ public class QueryExpressionsProviderImpl
     public <T> T templateFor( final Class<T> mixinType )
     {
         return (T) newProxyInstance(
-            QueryExpressions.class.getClassLoader(),
+            // XXX fb71: use classloader of the OSGi bundle of the mixin 
+            //QueryExpressions.class.getClassLoader(),
+            mixinType.getClassLoader(),
+            
             new Class[]{ mixinType },
             new MixinTypeProxy( mixinType )
         );

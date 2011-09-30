@@ -21,7 +21,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.qi4j.api.common.TypeName;
 import org.qi4j.api.composite.AmbiguousTypeException;
 import org.qi4j.api.entity.EntityComposite;
@@ -50,10 +51,15 @@ import static org.qi4j.api.unitofwork.UnitOfWorkCallback.UnitOfWorkStatus.*;
 
 public final class UnitOfWorkInstance
 {
-    public static final ThreadLocal<Stack<UnitOfWorkInstance>> current;
+    // FIXME fb71: this causes mem leaks if work and commit is done in different threads;
+    // as I don't need pause/resume I'm disabling this completely; to get this working
+    // properly thread/uow mapping has to be checked when accessing uow; on the other hand
+    // this would not allow to access uow from different threads; I don't see a reason for
+    // this; UnitOfWorkInstance needs to be thread safe and thats it
+     //public static final ThreadLocal<Stack<UnitOfWorkInstance>> current;
 
-    final HashMap<EntityReference, EntityState> stateCache;
-    final HashMap<InstanceKey, EntityInstance> instanceCache;
+    final ConcurrentHashMap<EntityReference, EntityState> stateCache;
+    final ConcurrentHashMap<InstanceKey, EntityInstance> instanceCache;
     final HashMap<EntityStore, EntityStoreUnitOfWork> storeUnitOfWork;
 
     private boolean open;
@@ -69,22 +75,23 @@ public final class UnitOfWorkInstance
 
     static
     {
-        current = new ThreadLocal<Stack<UnitOfWorkInstance>>()
-        {
-            protected Stack<UnitOfWorkInstance> initialValue()
-            {
-                return new Stack<UnitOfWorkInstance>();
-            }
-        };
+// FIXME fb71
+//        current = new ThreadLocal<Stack<UnitOfWorkInstance>>()
+//        {
+//            protected Stack<UnitOfWorkInstance> initialValue()
+//            {
+//                return new Stack<UnitOfWorkInstance>();
+//            }
+//        };
     }
 
     public UnitOfWorkInstance( Usecase usecase )
     {
         this.open = true;
-        stateCache = new HashMap<EntityReference, EntityState>();
-        instanceCache = new HashMap<InstanceKey, EntityInstance>();
+        stateCache = new ConcurrentHashMap( 1024, 0.75f, 4 );
+        instanceCache = new ConcurrentHashMap( 1024, 0.75f, 4 );
         storeUnitOfWork = new HashMap<EntityStore, EntityStoreUnitOfWork>();
-        current.get().push( this );
+//        current.get().push( this );
         paused = false;
         this.usecase = usecase;
     }
@@ -154,9 +161,15 @@ public final class UnitOfWorkInstance
             // Create instance
             entityInstance = new EntityInstance( uow, module, model, entityState );
 
-            stateCache.put( identity, entityState );
+            // fb71: another thread might have instantiated this entity; check and use
+            // previous if there is one and discard my entityState
+            EntityState previousState = stateCache.putIfAbsent( identity, entityState );
+            entityState = previousState != null ? previousState : entityState;
+            
+            // see above
             InstanceKey instanceKey = new InstanceKey( model.entityType().type(), identity );
-            instanceCache.put( instanceKey, entityInstance );
+            EntityInstance previousInstance = instanceCache.putIfAbsent( instanceKey, entityInstance );
+            entityInstance = previousInstance != null ? previousInstance : entityInstance;
         }
         else
         {
@@ -204,7 +217,9 @@ public final class UnitOfWorkInstance
             entityInstance = new EntityInstance( uow, module, model, entityState );
 
             instanceKey.update( model.entityType().type(), identity );
-            instanceCache.put( instanceKey, entityInstance );
+            // see above
+            EntityInstance previousInstance = instanceCache.putIfAbsent( instanceKey, entityInstance );
+            entityInstance = previousInstance != null ? previousInstance : entityInstance;
         }
 
         return entityInstance;
@@ -220,7 +235,8 @@ public final class UnitOfWorkInstance
         if( !paused )
         {
             paused = true;
-            current.get().pop();
+// FIXME fb71
+//            current.get().pop();
         }
         else
         {
@@ -233,7 +249,8 @@ public final class UnitOfWorkInstance
         if( paused )
         {
             paused = false;
-            current.get().push( this );
+// FIXME fb71
+//            current.get().push( this );
         }
         else
         {
@@ -314,10 +331,11 @@ public final class UnitOfWorkInstance
     {
         checkOpen();
 
-        if( !isPaused() )
-        {
-            current.get().pop();
-        }
+// FIXME fb71
+//        if( !isPaused() )
+//        {
+//            current.get().pop();
+//        }
         open = false;
 
         for( EntityInstance entityInstance : instanceCache.values() )

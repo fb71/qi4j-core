@@ -20,6 +20,7 @@
 package org.qi4j.runtime.query.grammar.impl;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import org.qi4j.api.property.GenericPropertyInfo;
@@ -90,6 +91,11 @@ public final class PropertyReferenceImpl<T>
             throw new QueryExpressionException( "Not a property type:" + returnType );
         }
         Type propertyTypeAsType = GenericPropertyInfo.getPropertyType( returnType );
+        // XXX fb71: there 2 (or more) type parameters: Property<Collection<String>>
+        // so more than just one dereferrence step is needed 
+        while (propertyTypeAsType instanceof ParameterizedType) {
+            propertyTypeAsType = ((ParameterizedType)propertyTypeAsType).getActualTypeArguments()[ 0 ];
+        }
         if( !( propertyTypeAsType instanceof Class ) )
         {
             throw new QueryExpressionException( "Unsupported property type:" + propertyTypeAsType );
