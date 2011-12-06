@@ -470,10 +470,15 @@ public final class UnitOfWorkInstance
                 protected void execute( EntityInstance instance )
                     throws Exception
                 {
-                    if( instance.<Object>proxy() instanceof UnitOfWorkCallback )
+                    
+                    // XXX falko: removed entities should and cannot be called back
+                    if (instance.entityState().status() != EntityStatus.REMOVED) 
                     {
-                        UnitOfWorkCallback callback = UnitOfWorkCallback.class.cast( instance.proxy() );
-                        callback.beforeCompletion();
+                        if( instance.<Object>proxy() instanceof UnitOfWorkCallback )
+                        {
+                            UnitOfWorkCallback callback = UnitOfWorkCallback.class.cast( instance.proxy() );
+                            callback.beforeCompletion();
+                        }
                     }
                 }
             }.execute();

@@ -207,6 +207,13 @@ public final class EntityInstance
             Identity other = ( (Identity) o );
             return other != null && other.identity().get().equals( identity.identity() );
         }
+        // XXX falko: if the compared entity was deleted then a NoSuchEntityException
+        // is thrown; this is equivalent to equals( null) which should just return null
+        // (instead of exception)
+        catch (NoSuchEntityException e )
+        {
+            return false;
+        }
         catch( ClassCastException e )
         {
             return false;
