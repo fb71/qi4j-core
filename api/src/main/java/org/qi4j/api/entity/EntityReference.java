@@ -23,7 +23,9 @@ import java.io.Serializable;
  * 123456-abcde
  * </pre>
  */
-public final class EntityReference
+// XXX falko: remove final in order to subclass and add specific info; used for
+// Lucene store to deliver additional docnum
+public class EntityReference
     implements Serializable
 {
     public static EntityReference parseURI( String uri )

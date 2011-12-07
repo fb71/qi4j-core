@@ -25,6 +25,7 @@ import org.qi4j.api.query.QueryExecutionException;
 import org.qi4j.api.query.grammar.BooleanExpression;
 import org.qi4j.api.unitofwork.NoSuchEntityException;
 import org.qi4j.api.unitofwork.UnitOfWork;
+import org.qi4j.runtime.structure.ModuleUnitOfWork;
 import org.qi4j.spi.query.EntityFinder;
 import org.qi4j.spi.query.EntityFinderException;
 
@@ -118,7 +119,8 @@ final class EntityQuery<T>
                     final EntityReference foundEntity = foundEntities.next();
                     try
                     {
-                        return unitOfWorkInstance.get( resultType, foundEntity.identity() );
+                        // falko: use foundEntity instead of foundEntity.identity()
+                        return ((ModuleUnitOfWork)unitOfWorkInstance).get( resultType, foundEntity );
                     }
                     catch( NoSuchEntityException e )
                     {

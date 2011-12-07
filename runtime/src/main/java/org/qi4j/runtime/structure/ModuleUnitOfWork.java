@@ -20,6 +20,7 @@ import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.composite.AmbiguousTypeException;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
+import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.entity.Identity;
 import org.qi4j.api.entity.IdentityGenerator;
 import org.qi4j.api.entity.LifecycleException;
@@ -209,6 +210,21 @@ public class ModuleUnitOfWork
 
         return uow.get( parseEntityReference( identity ), this, finder.models(), finder.modules(), type ).<T>proxy();
     }
+
+    // falko: used by EntityQuery in order to transport a custum EntityReference type
+    public <T> T get( Class<T> type, EntityReference identity )
+    throws EntityTypeNotFoundException, NoSuchEntityException
+    {
+        EntityFinder finder = moduleInstance.findEntityModel( type );
+
+        if( finder.noModelExist() )
+        {
+            throw new EntityTypeNotFoundException( type.getName() );
+        }
+
+        return uow.get( identity, this, finder.models(), finder.modules(), type ).<T>proxy();
+    }
+
 
     public <T> T get( T entity )
         throws EntityTypeNotFoundException

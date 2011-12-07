@@ -93,9 +93,10 @@ public final class BuilderEntityState
     {
     }
 
-    public void setProperty( QualifiedName stateName, Object newValue )
+    public Object setProperty( QualifiedName stateName, Object newValue )
     {
         properties.put( stateName, newValue );
+        return newValue;
     }
 
     public void setAssociation( QualifiedName stateName, EntityReference newEntity )

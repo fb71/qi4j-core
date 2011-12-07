@@ -87,8 +87,8 @@ public class EntityPropertyInstance<T>
         }
 
         // Change property
-        entityState.setProperty( propertyInfo.qualifiedName(), aNewValue );
-        value = aNewValue;
+        // XXX fb71: use value returned by EntityState impl.
+        value = (T)entityState.setProperty( propertyInfo.qualifiedName(), aNewValue );
     }
 
     /**

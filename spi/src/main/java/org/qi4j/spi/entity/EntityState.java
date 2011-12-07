@@ -69,7 +69,11 @@ public interface EntityState
 
     Object getProperty( QualifiedName stateName );
 
-    void setProperty( QualifiedName stateName, Object json );
+    /**
+     * 
+     * XXX fb71: allow the EntityState impl to tweak collections
+     */
+    Object setProperty( QualifiedName stateName, Object json );
 
     EntityReference getAssociation( QualifiedName stateName );
 

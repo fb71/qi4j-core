@@ -58,6 +58,8 @@ public final class UnitOfWorkInstance
     // this; UnitOfWorkInstance needs to be thread safe and thats it
      //public static final ThreadLocal<Stack<UnitOfWorkInstance>> current;
 
+    // XXX _fb71: make this concurrent in order to allow concurrent access to
+    // an UnitOfWork
     final ConcurrentHashMap<EntityReference, EntityState> stateCache;
     final ConcurrentHashMap<InstanceKey, EntityInstance> instanceCache;
     final HashMap<EntityStore, EntityStoreUnitOfWork> storeUnitOfWork;

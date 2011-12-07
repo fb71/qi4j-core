@@ -123,7 +123,7 @@ public final class JSONEntityState
         }
     }
 
-    public void setProperty( QualifiedName stateName, Object newValue )
+    public Object setProperty( QualifiedName stateName, Object newValue )
     {
         try
         {
@@ -140,6 +140,7 @@ public final class JSONEntityState
             }
             state.getJSONObject( "properties" ).put( stateName.name(), jsonValue );
             markUpdated();
+            return newValue;
         }
         catch( JSONException e )
         {

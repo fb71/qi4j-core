@@ -108,10 +108,11 @@ public final class DefaultEntityState
         return properties.get( stateName );
     }
 
-    public void setProperty( QualifiedName stateName, Object newValue )
+    public Object setProperty( QualifiedName stateName, Object newValue )
     {
         properties.put( stateName, newValue );
         markUpdated();
+        return newValue;
     }
 
     public EntityReference getAssociation( QualifiedName stateName )
