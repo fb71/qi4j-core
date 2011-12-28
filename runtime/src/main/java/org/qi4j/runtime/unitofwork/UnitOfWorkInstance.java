@@ -16,12 +16,16 @@
  */
 package org.qi4j.runtime.unitofwork;
 
+import static org.qi4j.api.unitofwork.UnitOfWorkCallback.UnitOfWorkStatus.COMPLETED;
+import static org.qi4j.api.unitofwork.UnitOfWorkCallback.UnitOfWorkStatus.DISCARDED;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.qi4j.api.common.TypeName;
 import org.qi4j.api.composite.AmbiguousTypeException;
@@ -47,8 +51,6 @@ import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
 import org.qi4j.spi.entitystore.StateCommitter;
 import org.qi4j.spi.structure.ModuleSPI;
 
-import static org.qi4j.api.unitofwork.UnitOfWorkCallback.UnitOfWorkStatus.*;
-
 public final class UnitOfWorkInstance
 {
     // FIXME fb71: this causes mem leaks if work and commit is done in different threads;
@@ -60,8 +62,8 @@ public final class UnitOfWorkInstance
 
     // XXX _fb71: make this concurrent in order to allow concurrent access to
     // an UnitOfWork
-    final ConcurrentHashMap<EntityReference, EntityState> stateCache;
-    final ConcurrentHashMap<InstanceKey, EntityInstance> instanceCache;
+    final ConcurrentMap<EntityReference, EntityState> stateCache;
+    final ConcurrentMap<InstanceKey, EntityInstance> instanceCache;
     final HashMap<EntityStore, EntityStoreUnitOfWork> storeUnitOfWork;
 
     private boolean open;
@@ -90,8 +92,16 @@ public final class UnitOfWorkInstance
     public UnitOfWorkInstance( Usecase usecase )
     {
         this.open = true;
-        stateCache = new ConcurrentHashMap( 1024, 0.75f, 4 );
-        instanceCache = new ConcurrentHashMap( 1024, 0.75f, 4 );
+
+//        stateCache = new FakeConcurrentMap( 1024, 0.75f );
+//        instanceCache = new FakeConcurrentMap( 1024, 0.75f );
+
+        stateCache = new ConcurrentHashMap( 1024, 0.75f, 8 );
+        instanceCache = new ConcurrentHashMap( 1024, 0.75f, 8 );
+        
+//        stateCache = new ConcurrentReferenceHashMap( 1024, 0.75f, 4, ReferenceType.STRONG, ReferenceType.SOFT, null );
+//        instanceCache = new ConcurrentReferenceHashMap( 1024, 0.75f, 4, ReferenceType.STRONG, ReferenceType.SOFT, null );
+
         storeUnitOfWork = new HashMap<EntityStore, EntityStoreUnitOfWork>();
 //        current.get().push( this );
         paused = false;
