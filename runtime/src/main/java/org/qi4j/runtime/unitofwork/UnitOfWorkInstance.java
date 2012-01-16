@@ -24,9 +24,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import org.qi4j.api.common.TypeName;
 import org.qi4j.api.composite.AmbiguousTypeException;
 import org.qi4j.api.entity.EntityComposite;
@@ -51,6 +48,9 @@ import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
 import org.qi4j.spi.entitystore.StateCommitter;
 import org.qi4j.spi.structure.ModuleSPI;
 
+import org.polymap.core.runtime.cache.Cache;
+import org.polymap.core.runtime.cache.CacheManager;
+
 public final class UnitOfWorkInstance
 {
     // FIXME fb71: this causes mem leaks if work and commit is done in different threads;
@@ -62,8 +62,8 @@ public final class UnitOfWorkInstance
 
     // XXX _fb71: make this concurrent in order to allow concurrent access to
     // an UnitOfWork
-    final ConcurrentMap<EntityReference, EntityState> stateCache;
-    final ConcurrentMap<InstanceKey, EntityInstance> instanceCache;
+    final Cache<EntityReference, EntityState> stateCache;
+    final Cache<InstanceKey, EntityInstance> instanceCache;
     final HashMap<EntityStore, EntityStoreUnitOfWork> storeUnitOfWork;
 
     private boolean open;
@@ -95,13 +95,21 @@ public final class UnitOfWorkInstance
 
 //        stateCache = new FakeConcurrentMap( 1024, 0.75f );
 //        instanceCache = new FakeConcurrentMap( 1024, 0.75f );
-
-        stateCache = new ConcurrentHashMap( 1024, 0.75f, 8 );
-        instanceCache = new ConcurrentHashMap( 1024, 0.75f, 8 );
         
-//        stateCache = new ConcurrentReferenceHashMap( 1024, 0.75f, 4, ReferenceType.STRONG, ReferenceType.SOFT, null );
-//        instanceCache = new ConcurrentReferenceHashMap( 1024, 0.75f, 4, ReferenceType.STRONG, ReferenceType.SOFT, null );
+//        stateCache = new CacheBuilder().softValues().initialCapacity( 1024 ).concurrencyLevel( 4 ).build( null );
+        
+//        stateCache = new MapMaker().initialCapacity( 1024 ).concurrencyLevel( 8 ).makeMap();
+//        instanceCache = new MapMaker().initialCapacity( 1024 ).concurrencyLevel( 8 ).makeMap();
 
+//        stateCache = new ConcurrentHashMap( 1024, 0.75f, 8 );
+//        instanceCache = new ConcurrentHashMap( 1024, 0.75f, 8 );
+        
+//        stateCache = new ConcurrentReferenceHashMap( 1024, 0.75f, 16, ReferenceType.STRONG, ReferenceType.SOFT, null );
+//        instanceCache = new ConcurrentReferenceHashMap( 1024, 0.75f, 16, ReferenceType.STRONG, ReferenceType.SOFT, null );
+
+        stateCache = CacheManager.instance().newCache( "stateCache" );
+        instanceCache = CacheManager.instance().newCache( "instanceCache" );
+        
         storeUnitOfWork = new HashMap<EntityStore, EntityStoreUnitOfWork>();
 //        current.get().push( this );
         paused = false;
@@ -176,7 +184,17 @@ public final class UnitOfWorkInstance
             // fb71: another thread might have instantiated this entity; check and use
             // previous if there is one and discard my entityState
             EntityState previousState = stateCache.putIfAbsent( identity, entityState );
-            entityState = previousState != null ? previousState : entityState;
+            if (previousState != null) {
+                // let the other thread do the work in the next 100ms;
+                // avoid subsequent concurrent loads
+                try {
+                    System.out.println( "sleeping..." );
+                    Thread.sleep( 200 );
+                }
+                catch (InterruptedException e) {
+                }
+                entityState = previousState;
+            }
             
             // see above
             InstanceKey instanceKey = new InstanceKey( model.entityType().type(), identity );
@@ -339,6 +357,14 @@ public final class UnitOfWorkInstance
         callbacks = currentCallbacks;
     }
 
+    protected void finalize() throws Throwable {
+        try {
+            close();
+        }
+        catch (Exception e) {
+        }
+    }
+
     private void close()
     {
         checkOpen();
@@ -356,6 +382,7 @@ public final class UnitOfWorkInstance
         }
 
         stateCache.clear();
+        instanceCache.clear();
     }
 
     public boolean isOpen()
@@ -415,8 +442,7 @@ public final class UnitOfWorkInstance
                     Collection<EntityComposite> modifiedEntities = new ArrayList<EntityComposite>();
                     for( EntityReference modifiedEntityIdentity : modifiedEntityIdentities )
                     {
-                        Collection<EntityInstance> instances = instanceCache.values();
-                        for( EntityInstance instance : instances )
+                        for( EntityInstance instance : instanceCache.values() )
                         {
                             if( instance.identity().equals( modifiedEntityIdentity ) )
                             {

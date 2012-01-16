@@ -8,7 +8,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Bundle-ClassPath: .,
- lib/cglib-nodep-2.2.jar
+ lib/cglib-nodep-2.2.jar,
+ lib/guava-10.0.1.jar
 Export-Package: org.json,
  org.qi4j.api,
  org.qi4j.api.common,
@@ -73,3 +74,4 @@ Export-Package: org.json,
  org.qi4j.spi.util,
  org.qi4j.spi.uuid,
  org.qi4j.spi.value
+Require-Bundle: org.polymap.core;bundle-version="3.1.0"
