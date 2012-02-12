@@ -49,6 +49,7 @@ import org.qi4j.spi.entitystore.StateCommitter;
 import org.qi4j.spi.structure.ModuleSPI;
 
 import org.polymap.core.runtime.cache.Cache;
+import org.polymap.core.runtime.cache.CacheConfig;
 import org.polymap.core.runtime.cache.CacheManager;
 
 public final class UnitOfWorkInstance
@@ -107,8 +108,8 @@ public final class UnitOfWorkInstance
 //        stateCache = new ConcurrentReferenceHashMap( 1024, 0.75f, 16, ReferenceType.STRONG, ReferenceType.SOFT, null );
 //        instanceCache = new ConcurrentReferenceHashMap( 1024, 0.75f, 16, ReferenceType.STRONG, ReferenceType.SOFT, null );
 
-        stateCache = CacheManager.instance().newCache( "stateCache" );
-        instanceCache = CacheManager.instance().newCache( "instanceCache" );
+        stateCache = CacheManager.instance().newCache( "stateCache", CacheConfig.DEFAULT );
+        instanceCache = CacheManager.instance().newCache( "instanceCache", CacheConfig.DEFAULT );
         
         storeUnitOfWork = new HashMap<EntityStore, EntityStoreUnitOfWork>();
 //        current.get().push( this );
@@ -410,9 +411,9 @@ public final class UnitOfWorkInstance
 
     public void createEntity( EntityInstance instance )
     {
-        stateCache.put( instance.identity(), instance.entityState() );
+        stateCache.putIfAbsent( instance.identity(), instance.entityState() );
         InstanceKey instanceKey = new InstanceKey( instance.entityModel().entityType().type(), instance.identity() );
-        instanceCache.put( instanceKey, instance );
+        instanceCache.putIfAbsent( instanceKey, instance );
     }
 
     private List<StateCommitter> applyChanges()
