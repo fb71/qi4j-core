@@ -123,7 +123,7 @@ public final class ModuleAssemblyImpl
             }
             else if( EntityComposite.class.isAssignableFrom( compositeType ) )
             {
-                throw new AssemblyException( "May not register EntityComposites as a Composite:" + compositeType.getName() );
+                throw new AssemblyException( "May not register EntityComposites as a TransientComposite:" + compositeType.getName() );
             }
             else if( ValueComposite.class.isAssignableFrom( compositeType ) )
             {
