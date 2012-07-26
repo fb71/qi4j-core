@@ -86,9 +86,11 @@ public class EntityPropertyInstance<T>
             constraints.checkConstraints( aNewValue );
         }
 
-        // Change property
-        // XXX fb71: use value returned by EntityState impl.
-        value = (T)entityState.setProperty( propertyInfo.qualifiedName(), aNewValue );
+        if (aNewValue != value) {
+            // Change property
+            // XXX fb71: use value returned by EntityState impl.
+            value = (T)entityState.setProperty( propertyInfo.qualifiedName(), aNewValue );
+        }
     }
 
     /**

@@ -186,6 +186,8 @@ public final class EntityInstance
 
         if( status() == EntityStatus.REMOVED )
         {
+            // XXX fb71: exception means that no one can detect that this entity is
+            // removed in this session (except for catching exception all over the code)
             throw new NoSuchEntityException( identity );
         }
 
