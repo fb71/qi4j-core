@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ConcurrentMap;
-
 import org.qi4j.api.common.TypeName;
 import org.qi4j.api.composite.AmbiguousTypeException;
 import org.qi4j.api.entity.EntityComposite;
@@ -50,9 +48,9 @@ import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
 import org.qi4j.spi.entitystore.StateCommitter;
 import org.qi4j.spi.structure.ModuleSPI;
 
-import com.google.common.collect.MapMaker;
-
 import org.polymap.core.runtime.cache.Cache;
+import org.polymap.core.runtime.cache.CacheConfig;
+import org.polymap.core.runtime.cache.CacheManager;
 
 public final class UnitOfWorkInstance
 {
@@ -65,8 +63,8 @@ public final class UnitOfWorkInstance
 
     // XXX _fb71: make this concurrent in order to allow concurrent access to
     // an UnitOfWork
-    final ConcurrentMap<EntityReference, EntityState> stateCache;
-    final ConcurrentMap<InstanceKey, EntityInstance> instanceCache;
+    final Cache<EntityReference, EntityState> stateCache;
+    final Cache<InstanceKey, EntityInstance> instanceCache;
     final HashMap<EntityStore, EntityStoreUnitOfWork> storeUnitOfWork;
 
     private boolean open;
@@ -106,8 +104,8 @@ public final class UnitOfWorkInstance
         
 //        stateCache = new CacheBuilder().softValues().initialCapacity( 1024 ).concurrencyLevel( 4 ).build( null );
         
-        stateCache = new MapMaker().initialCapacity( 1024 ).softValues().concurrencyLevel( 8 ).makeMap();
-        instanceCache = new MapMaker().initialCapacity( 1024 ).softValues().concurrencyLevel( 8 ).makeMap();
+//        stateCache = new MapMaker().initialCapacity( 1024 ).softValues().concurrencyLevel( 8 ).makeMap();
+//        instanceCache = new MapMaker().initialCapacity( 1024 ).softValues().concurrencyLevel( 8 ).makeMap();
 
 //        stateCache = new ConcurrentHashMap( 1024, 0.75f, 8 );
 //        instanceCache = new ConcurrentHashMap( 1024, 0.75f, 8 );
@@ -115,8 +113,8 @@ public final class UnitOfWorkInstance
 //        stateCache = new ConcurrentReferenceHashMap( 1024, 0.75f, 16, ReferenceType.STRONG, ReferenceType.SOFT, null );
 //        instanceCache = new ConcurrentReferenceHashMap( 1024, 0.75f, 16, ReferenceType.STRONG, ReferenceType.SOFT, null );
 
-//        stateCache = CacheManager.instance().newCache( CacheConfig.DEFAULT );
-//        instanceCache = CacheManager.instance().newCache( CacheConfig.DEFAULT );
+        stateCache = CacheManager.instance().newCache( CacheConfig.DEFAULT );
+        instanceCache = CacheManager.instance().newCache( CacheConfig.DEFAULT );
         
         storeUnitOfWork = new HashMap<EntityStore, EntityStoreUnitOfWork>();
 //        current.get().push( this );
