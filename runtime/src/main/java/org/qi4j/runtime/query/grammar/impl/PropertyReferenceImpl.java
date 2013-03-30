@@ -91,7 +91,7 @@ public final class PropertyReferenceImpl<T>
             throw new QueryExpressionException( "Not a property type:" + returnType );
         }
         Type propertyTypeAsType = GenericPropertyInfo.getPropertyType( returnType );
-        // XXX fb71: there 2 (or more) type parameters: Property<Collection<String>>
+        // XXX fb71: there are 2 (or more) type parameters: Property<Collection<String>>
         // so more than just one dereferrence step is needed 
         while (propertyTypeAsType instanceof ParameterizedType) {
             propertyTypeAsType = ((ParameterizedType)propertyTypeAsType).getActualTypeArguments()[ 0 ];

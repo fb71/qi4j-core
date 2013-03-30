@@ -552,7 +552,7 @@ public final class QueryExpressions
      * @throws IllegalArgumentException - If property is null or is not an property expression
      */
     @SuppressWarnings( "unchecked" )
-    private static <T> PropertyReference<T> asPropertyExpression( final Property<T> property )
+    public static <T> PropertyReference<T> asPropertyExpression( final Property<T> property )
     {
         if( property == null )
         {
@@ -624,7 +624,7 @@ public final class QueryExpressions
      *
      * @throws IllegalArgumentException - If value is null
      */
-    private static <T> SingleValueExpression<T> asTypedValueExpression( final T value )
+    public static <T> SingleValueExpression<T> asTypedValueExpression( final T value )
     {
         if( value == null )
         {

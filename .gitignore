@@ -16,3 +16,4 @@ testsupport/target/
 build-tools/qi4j-buildtools.iml
 build-tools/target/
 /lib
+/build

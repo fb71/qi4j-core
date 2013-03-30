@@ -23,7 +23,7 @@ import java.io.Serializable;
  * 123456-abcde
  * </pre>
  */
-// XXX falko: remove final in order to subclass and add specific info; used for
+// XXX fb71: remove final in order to subclass and add specific info; used for
 // Lucene store to deliver additional docnum
 public class EntityReference
     implements Serializable

@@ -133,6 +133,15 @@ public final class UnitOfWorkInstance
         return uow;
     }
 
+    /** 
+     * XXX fb71: HACK: allow {@link EntityQuery} access to this. I don't see to proper
+     * way to do this currently
+     */
+    public EntityStoreUnitOfWork entityStoreUnitOfWork() {
+        assert storeUnitOfWork.size() <= 1;
+        return storeUnitOfWork.isEmpty() ? null : storeUnitOfWork.values().iterator().next();
+    }
+    
     public EntityInstance get( EntityReference identity,
                                ModuleUnitOfWork uow,
                                List<EntityModel> potentialModels,
@@ -194,7 +203,7 @@ public final class UnitOfWorkInstance
                 // let the other thread do the work in the next 100ms;
                 // avoid subsequent concurrent loads
                 try {
-                    System.out.println( "sleeping..." );
+                    System.out.println( "UoW: sleeping while waiting for entity to be instantiated..." );
                     Thread.sleep( 200 );
                 }
                 catch (InterruptedException e) {

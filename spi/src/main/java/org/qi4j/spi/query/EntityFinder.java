@@ -19,15 +19,35 @@
 package org.qi4j.spi.query;
 
 import org.qi4j.api.common.Optional;
+import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.query.grammar.BooleanExpression;
 import org.qi4j.api.query.grammar.OrderBy;
+
+import com.google.common.base.Predicate;
 
 /**
  * JAVADOC Add JavaDoc
  */
 public interface EntityFinder
 {
+    /**
+     * Allows {@link EntityFinder} implementations to post-process results
+     * *after* an {@link EntityComposite} was created for the reference
+     * 
+     * @see EntityQuery 
+     * @author fb71
+     */
+    public abstract class PostProcessEntityReference
+            extends EntityReference
+            implements Predicate<EntityComposite> {
+
+        public PostProcessEntityReference( String identity ) {
+            super( identity );
+        }
+    }
+    
+    
     Iterable<EntityReference> findEntities( String resultType,
                                             @Optional BooleanExpression whereClause,
                                             @Optional OrderBy[] orderBySegments,
