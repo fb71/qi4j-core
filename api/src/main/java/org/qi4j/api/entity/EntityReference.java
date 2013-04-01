@@ -71,24 +71,23 @@ public class EntityReference
     @Override
     public boolean equals( Object o )
     {
-        if( this == o )
-        {
+        // XXX _fb71: make impl that works for subclasses too
+        if (this == o) {
             return true;
         }
-        if( o == null || getClass() != o.getClass() )
-        {
+        else if (o instanceof EntityReference) {
+            EntityReference that = (EntityReference) o;
+            return identity.equals( that.identity );
+        }
+        else {
             return false;
         }
-        EntityReference that = (EntityReference) o;
-        return identity.equals( that.identity );
     }
 
     @Override
     public int hashCode()
     {
-        int result;
-        result = identity.hashCode();
-        return result;
+        return identity.hashCode();
     }
 
     @Override

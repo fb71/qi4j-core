@@ -273,6 +273,11 @@ public class ModuleUnitOfWork
         uow.apply();
     }
 
+    public void revert()
+            throws UnitOfWorkCompletionException {
+        uow.revert();
+    }
+
     public void discard()
     {
         uow.discard();

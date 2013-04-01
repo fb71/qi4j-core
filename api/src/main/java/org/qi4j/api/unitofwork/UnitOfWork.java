@@ -189,6 +189,16 @@ public interface UnitOfWork
         throws UnitOfWorkCompletionException, ConcurrentEntityModificationException;
 
     /**
+     * 
+     * <p/>
+     * XXX _fb71:
+     *
+     * @throws UnitOfWorkCompletionException
+     */
+    void revert()
+            throws UnitOfWorkCompletionException;
+
+    /**
      * Discard thie UnitOfWork. Use this if a failure occurs that you cannot handle,
      * or if the usecase was of a read-only character.
      */

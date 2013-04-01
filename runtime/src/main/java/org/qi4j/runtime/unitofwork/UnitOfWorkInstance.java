@@ -315,6 +315,23 @@ public final class UnitOfWorkInstance
         complete( true );
     }
 
+    
+    public void revert() {
+        checkOpen();
+
+        for (EntityStoreUnitOfWork entityStoreUnitOfWork : storeUnitOfWork.values()) {
+            entityStoreUnitOfWork.discard();
+        }
+        instanceCache.clear();
+        stateCache.clear();
+        
+        // Copy list so that it cannot be modified during completion
+        List<UnitOfWorkCallback> currentCallbacks = callbacks == null ? null : new ArrayList<UnitOfWorkCallback>( callbacks );
+        notifyAfterCompletion( currentCallbacks, DISCARDED );
+        callbacks = currentCallbacks;
+    }
+
+    
     private void complete( boolean completeAndContinue )
         throws UnitOfWorkCompletionException
     {
