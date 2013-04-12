@@ -136,7 +136,7 @@ final class EntityQuery<T>
                         || entityState.status() == EntityStatus.UPDATED)) {
                     
                     T entity = ((ModuleUnitOfWork)unitOfWorkInstance).get( resultType, entityState.identity() );
-                    if (whereClause.eval( entity )) {
+                    if (whereClause == null || whereClause.eval( entity )) {
                         updated.add( entity );
                     }
                 }
