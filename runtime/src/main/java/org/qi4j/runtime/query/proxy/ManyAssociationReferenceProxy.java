@@ -54,10 +54,12 @@ public class ManyAssociationReferenceProxy
         associationReference = new ManyAssociationReferenceImpl( accessor, traversedAssociation );
 
         // Create any proxy
-        ClassLoader loader = ManyAssociationReferenceProxy.class.getClassLoader();
+        // XXX fb71: use cl of the property to make OSGi bundle content visible
+        //ClassLoader loader = ManyAssociationReferenceProxy.class.getClassLoader();
         Type associationType = associationReference.associationType();
 
         Class<?> associationClass = (Class<?>) associationType;
+        ClassLoader loader = associationClass.getClassLoader();
         MixinTypeProxy mixinTypeProxy = new MixinTypeProxy( associationClass, associationReference );
         anyproxy = newProxyInstance( loader, new Class[]{ associationClass }, mixinTypeProxy );
     }
