@@ -42,6 +42,13 @@ public class ApplicationInstance
         layerActivator = new Activator();
     }
 
+    /** _fb71: */
+    @Override
+    protected void finalize() throws Throwable {
+        System.out.print( "Qi4J Application: FINALIZED" );
+        passivate();
+    }
+
     public ApplicationModel model()
     {
         return model;
